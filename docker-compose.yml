@@ -1,0 +1,15 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:16
+    container_name: flower-shop-postgres
+    environment:
+      POSTGRES_DB: flower_shop
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234567zm
+    ports:
+      - "5432:5432"
+    volumes:
+      - flower_shop_pg:/var/lib/postgresql/data
+volumes:
+  flower_shop_pg:

@@ -1,0 +1,226 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-create-tables
+      author: zhenis
+      changes:
+        - createTable:
+            tableName: roles
+            columns:
+              - column: { name: id, type: BIGSERIAL, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: name, type: VARCHAR(30), constraints: { nullable: false, unique: true } }
+
+        - createTable:
+            tableName: users
+            columns:
+              - column: { name: id, type: BIGSERIAL, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: email, type: VARCHAR(80), constraints: { nullable: false, unique: true } }
+              - column: { name: full_name, type: VARCHAR(80), constraints: { nullable: false } }
+              - column: { name: password_hash, type: VARCHAR(255), constraints: { nullable: false } }
+              - column: { name: enabled, type: BOOLEAN, constraints: { nullable: false } }
+              - column: { name: role_id, type: BIGINT, constraints: { nullable: false } }
+              - column: { name: created_at, type: "TIMESTAMP WITH TIME ZONE", constraints: { nullable: false } }
+
+        - addForeignKeyConstraint:
+            baseTableName: users
+            baseColumnNames: role_id
+            referencedTableName: roles
+            referencedColumnNames: id
+            constraintName: fk_users_role
+
+        - createTable:
+            tableName: categories
+            columns:
+              - column: { name: id, type: BIGSERIAL, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: name, type: VARCHAR(80), constraints: { nullable: false, unique: true } }
+              - column: { name: description, type: VARCHAR(400) }
+
+        - createTable:
+            tableName: products
+            columns:
+              - column: { name: id, type: BIGSERIAL, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: name, type: VARCHAR(120), constraints: { nullable: false } }
+              - column: { name: description, type: VARCHAR(800) }
+              - column: { name: category_id, type: BIGINT, constraints: { nullable: false } }
+              - column: { name: price, type: "NUMERIC(12,2)", constraints: { nullable: false } }
+              - column: { name: active, type: BOOLEAN, constraints: { nullable: false } }
+              - column: { name: image_url, type: VARCHAR(500) }
+
+        - addForeignKeyConstraint:
+            baseTableName: products
+            baseColumnNames: category_id
+            referencedTableName: categories
+            referencedColumnNames: id
+            constraintName: fk_products_category
+
+        - createTable:
+            tableName: inventories
+            columns:
+              - column: { name: id, type: BIGSERIAL, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: product_id, type: BIGINT, constraints: { nullable: false, unique: true } }
+              - column: { name: quantity, type: INT, constraints: { nullable: false } }
+
+        - addForeignKeyConstraint:
+            baseTableName: inventories
+            baseColumnNames: product_id
+            referencedTableName: products
+            referencedColumnNames: id
+            constraintName: fk_inventory_product
+
+        - createTable:
+            tableName: carts
+            columns:
+              - column: { name: id, type: BIGSERIAL, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: user_id, type: BIGINT, constraints: { nullable: false, unique: true } }
+              - column: { name: updated_at, type: "TIMESTAMP WITH TIME ZONE", constraints: { nullable: false } }
+
+        - addForeignKeyConstraint:
+            baseTableName: carts
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_carts_user
+
+        - createTable:
+            tableName: cart_items
+            columns:
+              - column: { name: id, type: BIGSERIAL, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: cart_id, type: BIGINT, constraints: { nullable: false } }
+              - column: { name: product_id, type: BIGINT, constraints: { nullable: false } }
+              - column: { name: quantity, type: INT, constraints: { nullable: false } }
+              - column: { name: added_at, type: "TIMESTAMP WITH TIME ZONE", constraints: { nullable: false } }
+
+        - addForeignKeyConstraint:
+            baseTableName: cart_items
+            baseColumnNames: cart_id
+            referencedTableName: carts
+            referencedColumnNames: id
+            constraintName: fk_cart_items_cart
+
+        - addForeignKeyConstraint:
+            baseTableName: cart_items
+            baseColumnNames: product_id
+            referencedTableName: products
+            referencedColumnNames: id
+            constraintName: fk_cart_items_product
+
+        - addUniqueConstraint:
+            tableName: cart_items
+            columnNames: "cart_id, product_id"
+            constraintName: uk_cart_product
+
+        - createTable:
+            tableName: addresses
+            columns:
+              - column: { name: id, type: BIGSERIAL, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: user_id, type: BIGINT, constraints: { nullable: false } }
+              - column: { name: city, type: VARCHAR(120), constraints: { nullable: false } }
+              - column: { name: street, type: VARCHAR(180), constraints: { nullable: false } }
+              - column: { name: house, type: VARCHAR(30), constraints: { nullable: false } }
+              - column: { name: apartment, type: VARCHAR(30) }
+              - column: { name: phone, type: VARCHAR(40), constraints: { nullable: false } }
+              - column: { name: is_default, type: BOOLEAN, constraints: { nullable: false } }
+
+        - addForeignKeyConstraint:
+            baseTableName: addresses
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_addresses_user
+
+        - createTable:
+            tableName: orders
+            columns:
+              - column: { name: id, type: BIGSERIAL, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: user_id, type: BIGINT, constraints: { nullable: false } }
+              - column: { name: address_id, type: BIGINT, constraints: { nullable: false } }
+              - column: { name: status, type: VARCHAR(30), constraints: { nullable: false } }
+              - column: { name: total_amount, type: "NUMERIC(12,2)", constraints: { nullable: false } }
+              - column: { name: created_at, type: "TIMESTAMP WITH TIME ZONE", constraints: { nullable: false } }
+
+        - addForeignKeyConstraint:
+            baseTableName: orders
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_orders_user
+
+        - addForeignKeyConstraint:
+            baseTableName: orders
+            baseColumnNames: address_id
+            referencedTableName: addresses
+            referencedColumnNames: id
+            constraintName: fk_orders_address
+
+        - createTable:
+            tableName: order_items
+            columns:
+              - column: { name: id, type: BIGSERIAL, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: order_id, type: BIGINT, constraints: { nullable: false } }
+              - column: { name: product_id, type: BIGINT, constraints: { nullable: false } }
+              - column: { name: quantity, type: INT, constraints: { nullable: false } }
+              - column: { name: price_at_purchase, type: "NUMERIC(12,2)", constraints: { nullable: false } }
+
+        - addForeignKeyConstraint:
+            baseTableName: order_items
+            baseColumnNames: order_id
+            referencedTableName: orders
+            referencedColumnNames: id
+            constraintName: fk_order_items_order
+
+        - addForeignKeyConstraint:
+            baseTableName: order_items
+            baseColumnNames: product_id
+            referencedTableName: products
+            referencedColumnNames: id
+            constraintName: fk_order_items_product
+
+        - createTable:
+            tableName: payments
+            columns:
+              - column: { name: id, type: BIGSERIAL, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: order_id, type: BIGINT, constraints: { nullable: false, unique: true } }
+              - column: { name: method, type: VARCHAR(20), constraints: { nullable: false } }
+              - column: { name: status, type: VARCHAR(20), constraints: { nullable: false } }
+              - column: { name: amount, type: "NUMERIC(12,2)", constraints: { nullable: false } }
+              - column: { name: created_at, type: "TIMESTAMP WITH TIME ZONE", constraints: { nullable: false } }
+
+        - addForeignKeyConstraint:
+            baseTableName: payments
+            baseColumnNames: order_id
+            referencedTableName: orders
+            referencedColumnNames: id
+            constraintName: fk_payments_order
+
+        - createTable:
+            tableName: deliveries
+            columns:
+              - column: { name: id, type: BIGSERIAL, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: order_id, type: BIGINT, constraints: { nullable: false, unique: true } }
+              - column: { name: status, type: VARCHAR(30), constraints: { nullable: false } }
+              - column: { name: courier_name, type: VARCHAR(120) }
+              - column: { name: courier_phone, type: VARCHAR(40) }
+              - column: { name: delivered_at, type: "TIMESTAMP WITH TIME ZONE" }
+
+        - addForeignKeyConstraint:
+            baseTableName: deliveries
+            baseColumnNames: order_id
+            referencedTableName: orders
+            referencedColumnNames: id
+            constraintName: fk_deliveries_order
+
+  - changeSet:
+      id: 002-seed-roles
+      author: zhenis
+      changes:
+        - insert:
+            tableName: roles
+            columns:
+              - column: { name: name, value: "ADMIN" }
+        - insert:
+            tableName: roles
+            columns:
+              - column: { name: name, value: "USER" }
+        - insert:
+            tableName: roles
+            columns:
+              - column: { name: name, value: "MANAGER" }

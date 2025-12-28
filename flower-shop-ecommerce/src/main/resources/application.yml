@@ -1,0 +1,23 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/flower_shop
+    username: postgres
+    password: Aipon2006
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+    open-in-view: false
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yml
+
+app:
+  security:
+    jwt:
+      secret: "ZhenisZhenisZhenisZhenisZhenisZhenis"
+      expirationMinutes: 120
