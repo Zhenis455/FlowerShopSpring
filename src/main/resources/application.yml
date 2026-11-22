@@ -3,9 +3,9 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/flower_shop
-    username: postgres
-    password: 1234567zm
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/flower_shop}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: validate
@@ -19,5 +19,5 @@ spring:
 app:
   security:
     jwt:
-      secret: "ZhenisZhenisZhenisZhenisZhenisZhenis"
+      secret: ${JWT_SECRET}
       expirationMinutes: 120
