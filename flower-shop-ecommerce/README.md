@@ -31,13 +31,7 @@ docker compose up -d
 ```
 
 ### 2) Настроить JWT secret
-В `src/main/resources/application.yml`:
-```yml
-app:
-  security:
-    jwt:
-      secret: "CHANGE_ME_TO_A_LONG_RANDOM_SECRET_32+_CHARS"
-```
+Set database and JWT signing secrets through environment variables (do not commit real secrets).
 
 ### 3) Запустить приложение
 - Открой проект в IntelliJ → Maven → `spring-boot:run`
@@ -66,3 +60,27 @@ mvn spring-boot:run
   - создание/редактирование товаров и категорий + mark-paid
 - ADMIN:
   - полный доступ + `/api/admin/users/**`
+
+## Environment setup (updated November 2026)
+
+Database credentials and the JWT secret are **not stored in source files anymore**. Configure them in the shell before launching the application:
+
+**Windows CMD**
+```cmd
+set DB_URL=jdbc:postgresql://localhost:5432/flower_shop
+set DB_USER=postgres
+set DB_PASSWORD=YOUR_LOCAL_DATABASE_PASSWORD
+set JWT_SECRET=REPLACE_WITH_YOUR_OWN_RANDOM_SECRET_AT_LEAST_32_CHARACTERS
+mvn spring-boot:run
+```
+
+**macOS/Linux**
+```bash
+export DB_URL=jdbc:postgresql://localhost:5432/flower_shop
+export DB_USER=postgres
+export DB_PASSWORD='your_local_password'
+export JWT_SECRET='your_unique_random_secret_at_least_32_chars'
+mvn spring-boot:run
+```
+
+If older commits contained a real DB password or signing secret, **rotate them**: changing the current file does not erase Git history. Use a dedicated local PostgreSQL database and never expose demo credentials on a public server. Run `mvn test` to check available unit tests; CI build is separate from a real database integration test.
